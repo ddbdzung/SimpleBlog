@@ -1,0 +1,11 @@
+<article class="py-12 px-4">
+  <h1 class="text-4xl text-center mb-4 font-semibold font-heading font-semibold"><%= post.subject %></h1>
+  <p class="text-center">
+    <span><%= post.createdAt %>, by</span>
+    <a class="ml-1 text-indigo-600 hover:underline cursor-pointer">me</a>
+  </p>
+  
+  <div class="max-w-3xl mx-auto">
+    <%- post.sanitizedHtml %>
+  </div>
+</article>

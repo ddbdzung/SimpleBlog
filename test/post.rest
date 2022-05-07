@@ -1,0 +1,14 @@
+# Post
+
+# create new post
+
+POST http://localhost:1010/posts/create
+Content-Type: application/json
+
+{
+  "subject": "I Love You",
+  "description": "Love you forever haha",
+  "markdown": "test content heloya hahahahahaha haahahahahahhaaha hhahahahah ahaahahahahahh ahaasldlas jdlajskdjlasdjl kasjdlasjdlajskldjasd jalskjdslak"
+}
+
+###

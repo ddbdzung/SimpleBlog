@@ -1,0 +1,95 @@
+<!-- overlay -->
+<div id="modal_overlay_edit"
+  class="hidden absolute inset-0 bg-black bg-opacity-30 h-screen w-full flex justify-center items-start md:items-center pt-10 md:pt-0">
+
+  <!-- modal -->
+  <div id="modal_edit"
+    class="z-50 pacity-0 transform -translate-y-full scale-150  relative w-10/12 md:w-1/2 h-1/2 md:h-3/4 bg-white rounded shadow-lg transition-opacity transition-transform duration-300">
+
+    <!-- button close -->
+    <button onclick="openModal(false)"
+      class="absolute -top-3 -right-3 bg-red-500 hover:bg-red-600 text-2xl w-10 h-10 rounded-full focus:outline-none text-white">
+      &cross;
+    </button>
+
+    <div class="heading text-center font-bold text-2xl m-5 text-gray-800">Edit the post</div>
+    <style>
+      body {
+        background: white !important;
+      }
+    </style>
+    <form action="/posts/create" method="POST" id="post-form">
+      <div class="editor mx-auto w-10/12 flex flex-col text-gray-800 border border-gray-300 p-4 shadow-lg max-w-2xl">
+        <input id="sub01" name="subject" class="title bg-gray-100 border border-gray-300 p-3 mb-4 outline-none" spellcheck="false"
+          placeholder="Subject" type="text">
+        <textarea id="des01" name="description"
+          class="description bg-gray-100 sec mb-2 p-3 h-15 border border-gray-300 outline-none" spellcheck="false"
+          placeholder="Describe about this post"></textarea>
+
+        <textarea id="mark01" name="markdown" class="description bg-gray-100 sec p-3 h-60 border border-gray-300 outline-none"
+          spellcheck="false" placeholder="Your content"></textarea>
+
+        <!-- icons -->
+        <div class="icons flex text-gray-500 m-2">
+          <svg class="mr-2 cursor-pointer hover:text-gray-700 border rounded-full p-1 h-7"
+            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+          </svg>
+          <div class="count ml-auto text-gray-400 text-xs font-semibold">0/300</div>
+        </div>
+        <!-- buttons -->
+        <div class="buttons flex">
+          <div class="btn border border-gray-300 p-1 px-4 font-semibold cursor-pointer text-gray-500 ml-auto"
+            onclick="openModal(false)">
+            Cancel</div>
+          <button type="submit"
+            class="btn border border-indigo-500 p-1 px-4 font-semibold cursor-pointer text-gray-200 ml-2 bg-indigo-500">
+            Change</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+  const modal_overlay1 = document.querySelector('#modal_overlay_edit');
+  const modal1 = document.querySelector('#modal_edit');
+
+  function getPostDataAndParse(postSlug) {
+    var url = `http://localhost:1010/api/${postSlug}`
+    fetch(url)
+      .then(function(response) {
+        return response.json()
+      })
+      .then(function(data) {
+        document.getElementById('sub01').value = data['subject']
+        document.getElementById('des01').value = data['description']
+        document.getElementById('mark01').value = data['markdown']
+      })
+  }
+
+  function openModalToEdit(value) {
+      const modalCl = modal1.classList
+      const overlayCl = modal_overlay1
+
+      if (value) {
+          overlayCl.classList.remove('hidden')
+          setTimeout(() => {
+              modalCl.remove('opacity-0')
+              modalCl.remove('-translate-y-full')
+              modalCl.remove('scale-150')
+          }, 100);
+      } else {
+          modalCl.add('-translate-y-full')
+          setTimeout(() => {
+              modalCl.add('opacity-0')
+              modalCl.add('scale-150')
+          }, 100);
+          setTimeout(() => overlayCl.classList.add('hidden'), 300);
+      }
+      
+      // console.log(btnEditor.getAttribute('data-slug'))
+      // getPostDataAndParse(btnEditor.getAttribute('data-slug'))
+  }
+  openModalToEdit(false)
+</script>

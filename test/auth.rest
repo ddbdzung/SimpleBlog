@@ -1,0 +1,133 @@
+# sign-up new user
+
+# user 1 - correct
+POST http://localhost:1010/auth/sign-up
+Content-Type: application/json
+
+{
+  "fullname": "Đặng Đức Bảo Dũng",
+  "email": "tester@gmail.com",
+  "password": "Abc123!@#",
+  "conf_password": "Abc123!@#"
+}
+
+###
+
+# user 2 - correct
+POST http://localhost:1010/auth/sign-up
+Content-Type: application/json
+
+{
+  "fullname": "Mai An Tiên",
+  "email": "hehehehe@gmail.com",
+  "password": "Abc321!@#",
+  "conf_password": "Abc321!@#"
+}
+
+###
+
+# user 3 - correct
+POST http://localhost:1010/auth/sign-up
+Content-Type: application/json
+
+{
+  "fullname": "Đặng Đức Bảo Dũng",
+  "email": "tester2@gmail.com",
+  "password": "Kanade.2002.",
+  "conf_password": "Kanade.2002."
+}
+
+###
+
+# user 4 - correct
+POST http://localhost:1010/auth/sign-up
+Content-Type: application/json
+
+{
+  "fullname": "Đặng Đức Bảo Dũng",
+  "email": "tester3@gmail.com",
+  "password": "Kanade.2002.",
+  "conf_password": "Kanade.2002."
+}
+
+###
+
+# admin 1 - correct
+POST http://localhost:1010/auth/sign-up
+Content-Type: application/json
+
+{
+  "fullname": "Mai An Tiên",
+  "email": "hehehehe4@gmail.com",
+  "password": "Abc321!@#",
+  "conf_password": "Abc321!@#",
+  "role": "admin"
+}
+
+###
+
+# user 1 - error: email required
+POST http://localhost:1010/auth/sign-up
+Content-Type: application/json
+
+{
+  "fullname": "Đặng Đức Bảo Dũng",
+  "email": "",
+  "password": "Abc123!@#",
+  "conf_password": "Abc123!@#"
+}
+
+###
+
+# login
+
+# user 1 - correct
+POST http://localhost:1010/auth/
+Content-Type: application/json
+
+{
+  "email": "tester@gmail.com",
+  "password": "Abc123!@#"
+}
+
+###
+
+# user 1 - error: email
+POST http://localhost:1010/auth/
+Content-Type: application/json
+
+{
+  "email": "tester1@gmail.com",
+  "password": "Abc123!@#"
+}
+
+###
+
+# user 1 - error: password
+POST http://localhost:1010/auth/
+Content-Type: application/json
+
+{
+  "email": "tester@gmail.com",
+  "password": "Abc123!@#1"
+}
+
+###
+
+# user 1 - error: emai | password required
+POST http://localhost:1010/auth/
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": ""
+}
+
+###
+
+# logout
+
+# user 1 - correct
+
+GET http://localhost:1010/auth/logout
+

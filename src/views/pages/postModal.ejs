@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+        integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+</head>
+
+<style>
+    #main {
+        width: 100%;
+
+        display: flex;
+        justify-content: center;
+    }
+
+    .container1 {
+        width: 500px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .sup-subject {
+        margin-bottom: 8px;
+    }
+</style>
+
+<body style="position: relative;">
+    <form action="/posts/update/<%= post.slug %>?_method=PUT" method="POST">
+        <div id="main">
+            <div class="container1">
+                <div class="sup-subject">
+                    <label for="subject">Subject</label>
+                    <input class="subject1" type="text" name="subject" value="<%= post.subject %>">
+                </div>
+                <div>
+                    <label for="description">Description</label>
+                    <input class="description1" type="text" name="description" value="<%= post.description %>">
+                </div>
+                <div>
+                    <label for="markdown">Content</label>
+                    <div id="editor"></div>
+                    <input type="hidden" name="markdown" />
+                </div>
+            </div>
+        </div>
+        <button style="margin-top:16px; position: absolute; right: 40%;" type="reset" onclick="clearEditor();">Reset</button>
+        <button style="margin-top:16px; position: absolute; right: 30%;" type="submit">Update</button>
+    </form>
+    <script>
+        function clearEditor() {
+            const test = editor.getRangeInfoOfNode()
+            editor.deleteSelection(test.range[0], test.range[1])
+        }
+        $(document).on("submit", "form", function (event) {
+            $('[name=markdown]').attr('value', editor.getMarkdown());
+            $(window).off('beforeunload');
+        });
+        var Editor = toastui.Editor;
+        const editor = new Editor({
+            el: document.querySelector('#editor'),
+            height: '500px',
+            initialValue: `<%= post.markdown %>`,
+            initialEditType: 'wysiwyg',
+            previewStyle: 'tab'
+        });
+        var excludeToolbarItem = [
+            'image', 'codeblock',
+        ]
+        excludeToolbarItem.forEach(item => editor.removeToolbarItem(item))
+    </script>
+</body>
+
+</html>
