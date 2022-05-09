@@ -3,12 +3,15 @@ const { catchAsync, pick } = require('../utils')
 
 // [GET /posts]
 const viewOwnPosts = catchAsync(async (req, res) => {
-  if (!req.user[0]._id) {
+  // Convert user ID from objectID to string
+  let userId = req.user._id
+  userId = userId.toString()
+  if (!userId) {
     return res.status(500).json({
       msg: 'Fail to authenticate! Log in again please!',
     })
   }
-  const posts = await postService.getPostsByUserId(req.user[0]._id)
+  const posts = await postService.getPostsByUserId(userId)
   return res.render('pages/ownPosts_auth', {
     title: 'Blog',
     posts: posts,

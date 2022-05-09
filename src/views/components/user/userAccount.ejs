@@ -1,0 +1,109 @@
+<!-- This is an example component -->
+<div class="max-w-2xl mx-auto bg-white p-16">
+
+  <form>
+    <div class="grid gap-6 mb-6 lg:grid-cols-2">
+      <div>
+        <label for="fullname" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Full name</label>
+        <input name="fullname" value="<%= user.fullname %>" type="text" id="fullname"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          required>
+      </div>
+
+      <div class="mb-6">
+        <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Address</label>
+        <input name="address" value="<%= user.address %>" type="text" id="address"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      </div>
+      <div class="mb-6">
+        <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Phone number</label>
+        <input name="phone" value="<%= user.phone %>" type="tel" id="phone"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+      </div>
+    </div>
+    <div class="mb-6">
+      <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Email address</label>
+      <input name="email" value="<%= user.email %>" type="email" id="email"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        required>
+    </div>
+    <input type="button" value="Reset" id="reset-btn"
+      class="cursor-pointer text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+    <input type="button" value="Update" id="update-btn"
+      class="cursor-pointer text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+  </form>
+</div>
+<script type="text/javascript" src="/js/lib/jquery.compressed.js"></script>
+<script type="text/javascript">
+  var userData = {}
+  var originUserData = {}
+
+  function updateUserInfo() {
+    $('#fullname').bind('change', function () {
+      userData.fullname = $(this).val()
+    })
+    $('#address').bind('change', function () {
+      userData.address = $(this).val()
+    })
+    $('#email').bind('change', function () {
+      userData.email = $(this).val()
+    })
+    $('#phone').bind('change', function () {
+      userData.phone = $(this).val()
+    })
+  }
+
+  function callUpdateUserInfoAPI(data) {
+    $.ajax({
+      url: '/user',
+      type: 'PUT',
+      cache: false,
+      processData: false,
+      data: data,
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
+      success: function(data) {
+        alert('Update user information successfully!')
+
+        // Shallow copy
+        originUserData = Object.assign(originUserData, data)
+
+        // originUserData = JSON.parse(JSON.stringify(data)) 
+        // => Don't need above deep copy 'cause each API calling will return new data variable
+        $('#reset-btn').click()
+      },
+      error: function(response) {
+        alert(response.responseJSON.errors)
+        $('#reset-btn').click()
+      },
+    })
+  }
+
+  $(document).ready(function () {
+    updateUserInfo()
+    originUserData = {
+      fullname: $('#fullname').val(),
+      phone: $('#phone').val(),
+      email: $('#email').val(),
+      address: $('#address').val(),
+    }
+
+    $('#reset-btn').bind('click', function () {
+      userData = {}
+      $('#fullname').val(originUserData.fullname)
+      $('#address').val(originUserData.address)
+      $('#email').val(originUserData.email)
+      $('#phone').val(originUserData.phone)
+    })
+
+    $('#update-btn').bind('click', function () {
+      if ($.isEmptyObject(userData)) {
+        alert('You have to change something of your information before updating!')
+        return;
+      }
+
+      let JSONifyData = JSON.stringify(userData)
+      callUpdateUserInfoAPI(JSONifyData)
+    })
+  });
+</script>

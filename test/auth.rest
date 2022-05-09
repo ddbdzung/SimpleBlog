@@ -26,32 +26,6 @@ Content-Type: application/json
 
 ###
 
-# user 3 - correct
-POST http://localhost:1010/auth/sign-up
-Content-Type: application/json
-
-{
-  "fullname": "Đặng Đức Bảo Dũng",
-  "email": "tester2@gmail.com",
-  "password": "Kanade.2002.",
-  "conf_password": "Kanade.2002."
-}
-
-###
-
-# user 4 - correct
-POST http://localhost:1010/auth/sign-up
-Content-Type: application/json
-
-{
-  "fullname": "Đặng Đức Bảo Dũng",
-  "email": "tester3@gmail.com",
-  "password": "Kanade.2002.",
-  "conf_password": "Kanade.2002."
-}
-
-###
-
 # admin 1 - correct
 POST http://localhost:1010/auth/sign-up
 Content-Type: application/json

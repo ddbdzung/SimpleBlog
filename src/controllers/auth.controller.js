@@ -19,7 +19,7 @@ const getRegisterView = catchAsync(async (req, res) => {
 })
 
 // [POST /auth/sign-up]
-const postRegister = catchAsync(async (req, res, next) => {
+const postRegister = catchAsync(async (req, res) => {
   const successArr = []
   const userObj = pick(req.body, ['fullname', 'email', 'password'])
   try {
