@@ -24,8 +24,10 @@ router
 
 router
   .route('/update/:postSlug')
-  .get(authGetProject, postController.viewUpdatePost)
-  .put(authGetProject, postController.updatePost)
+  .get(postController.viewUpdatePost)
+  .put(postController.updatePost)
+  // .get(authGetProject, postController.viewUpdatePost)
+  // .put(authGetProject, postController.updatePost)
   
 router
   .route('/:postSlug')

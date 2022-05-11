@@ -32,7 +32,7 @@ const viewAllPosts = catchAsync(async (req, res) => {
 
 const viewSinglePost = catchAsync(async (req, res) => {
   const post = await postService.getPostByPostSlug(req.params.postSlug)
-
+  // console.log(post)
   res.render('pages/singlePost', {
     title: 'Blog',
     post: post,
@@ -40,9 +40,10 @@ const viewSinglePost = catchAsync(async (req, res) => {
 })
 
 const viewUpdatePost = catchAsync(async (req, res) => {
+  const post = await postService.getPostByPostSlug(req.params.postSlug)
   return res.render('pages/postModal', {
     title: 'Blog',
-    post: res.locals.post,
+    post,
   })
 })
 
@@ -57,6 +58,7 @@ const updatePost = catchAsync(async (req, res) => {
 })
 
 const viewCreatePost = catchAsync(async (req, res) => {
+  console.log(req.user)
   res.render('pages/create_post_page', {
     title: 'Create new post'
   })
@@ -64,7 +66,8 @@ const viewCreatePost = catchAsync(async (req, res) => {
 
 const createPost = catchAsync(async (req, res) => {
   const postBody = pick(req.body, ['subject', 'description', 'markdown'])
-  postBody.user = req.user[0]._id
+  // postBody.user = req.user[0]._id
+  postBody.user = req.user._id
   try {
     const post = await postService.createPost(postBody)
 

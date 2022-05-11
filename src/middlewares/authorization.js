@@ -9,7 +9,8 @@ const authGetProject = async (req, res, next) => {
   if (!post) {
     next(new ApiError(httpStatus[400], 'No post found'))
   }
-  const user = req.user[0]
+  // const user = req.user[0]
+  const user = req.user
 
   // Session will store an array of users, default user = user[0]
   if (!canViewAndEditUserPost(user, post)) {
