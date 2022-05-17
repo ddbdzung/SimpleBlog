@@ -5,7 +5,7 @@ const httpStatus = require('http-status')
 const bodyParser = require('body-parser')
 const passport = require('passport')
 const methodOverride = require('method-override')
-const morgan = require('morgan')
+const logger = require('morgan')
 
 const configViewEngine = require('./src/configs/viewEngine')
 const ConnectDB = require('./src/configs/connectDB')
@@ -28,7 +28,7 @@ configSession(app)
 configViewEngine(app)
 
 // Use morgan for debugging
-app.use(morgan('combined'))
+app.use(logger('dev'))
 
 // parse json request body
 app.use(express.json())

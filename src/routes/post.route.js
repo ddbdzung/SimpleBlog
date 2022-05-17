@@ -10,8 +10,8 @@ const postController = require('../controllers/post.controller')
 router.use(isAuth.checkLogIn)
 
 router
-.route('/')
-.get(postController.viewOwnPosts)
+  .route('/')
+  .get(postController.viewOwnPosts)
 
 router
   .route('/all')
@@ -24,10 +24,8 @@ router
 
 router
   .route('/update/:postSlug')
-  // .get(postController.viewUpdatePost)
-  .put(postController.updatePost)
   .get(authGetProject, postController.viewUpdatePost)
-  // .put(authGetProject, postController.updatePost)
+  .put(authGetProject, postController.updatePost)
   
 router
   .route('/:postSlug')

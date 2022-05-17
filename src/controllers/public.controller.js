@@ -1,18 +1,42 @@
 const httpStatus = require('http-status')
-const ApiError = require('../utils/ApiError')
-const catchAsync = require('../utils/catchAsync')
+const { ApiError, catchAsync, pick } = require('../utils')
 const { postService } = require('../services')
 
 // [GET /]
 const viewPosts = catchAsync(async (req, res) => {
-  const posts = await postService.getAllPosts()
+  // Pagination
+  const queryObj = pick(req.query, ['page'])
+  let isNumber = new RegExp(/^\d+\.?\d*$/)
+  let currentPage = (!queryObj['page'] || !isNumber.test(queryObj['page'])) 
+    ? 1 
+    : parseInt(queryObj['page'], 10)
 
-  res.render('pages/allPosts', {
-    title: 'Blog',
-    errors: req.flash('errors'),
-    successes: req.flash('successes'),
-    posts: posts,
-  })
+  currentPage = (currentPage < 1)
+    ? 1
+    : currentPage
+    
+  postService.paginatePostOfAllUsers(currentPage)
+    .then(result => {
+      if (currentPage > result['pageQuantity'] || currentPage < 1) 
+        return res.status(400).render('pages/error', {
+          title: 'Page not found',
+          code: 404,
+          error: 'Page not fount',
+          description: `The page you’re looking for doesn’t exist.`,
+        })
+
+      // postService.getAllPosts(3).then((result) => res.send(result))
+      return res.render('pages/allPosts_auth', {
+        title: 'Blog',
+        posts: result['posts'],
+        pageQuantity: result['pageQuantity'],
+        currentPage,
+      })
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).send('INTERNAL SERVER ERROR')
+    })
 })
 
 // [GET /:postSlug]

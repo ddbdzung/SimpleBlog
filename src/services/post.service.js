@@ -3,84 +3,11 @@ const slugify = require('slugify')
 const { marked } = require('marked')
 const createDomPurify = require('dompurify')
 const { JSDOM } = require('jsdom')
-
 const dompurify = createDomPurify(new JSDOM().window)
 
 const { Post } = require('../models');
-const { userService } = require('../services')
 const ApiError = require('../utils/ApiError');
-
-// /**
-//  * Query for post
-//  * @param {Object} filter - Mongo filter
-//  * @param {Object} options - Query options
-//  * @param {string} [options.sortBy] - Sort option in the format: sortField:(desc|asc)
-//  * @param {number} [options.limit] - Maximum number of results per page (default = 10)
-//  * @param {number} [options.page] - Current page (default = 1)
-//  * @returns {Promise<QueryResult>}
-//  */
-// const getPosts = async (filter, options) => {
-//   const post = await Post.paginate(filter, options);
-//   return post;
-// };
-
-// /**
-//  * Create a post
-//  * @param {Object} postBody
-//  * @returns {Promise<Post>}
-//  */
-// const createPost = async (postBody) => {
-//   if (await Post.isTitleDuplicate(postBody.title)) {
-//     throw new ApiError(httpStatus.BAD_REQUEST, 'Tên bài viết đã tồn tại');
-//   }
-
-//   return Post.create(postBody);
-// };
-
-// /**
-//  * Get post by id
-//  * @param {ObjectId} id
-//  * @returns {Promise<Post>}
-//  */
-// const getPostById = async (id) => {
-//   await redisService.setex(`post`, id, '1m', await Post.findById(id));
-//   return Post.findById(id);
-// };
-
-// /**
-//  * Update post by id
-//  * @param {ObjectId} postId
-//  * @param {Object} updateBody
-//  * @returns {Promise<Post>}
-//  */
-// const updatePostById = async (postId, updateBody) => {
-//   const post = await getPostById(postId);
-//   if (!post) {
-//     throw new ApiError(httpStatus.NOT_FOUND, 'Bài viêt không tồn tại');
-//   }
-//   if (updateBody.title && (await Post.isTitleDuplicate(updateBody.title))) {
-//     throw new ApiError(httpStatus.BAD_REQUEST, 'Tên bài viết đã tồn tại');
-//   }
-
-//   Object.assign(post, updateBody);
-//   await post.save();
-//   return post;
-// };
-
-// /**
-//  * Delete post by id
-//  * @param {ObjectId} postId
-//  * @returns {Promise<Post>}
-//  */
-// const deletePostById = async (postId) => {
-//   const post = await getPostById(postId);
-
-//   if (!post) {
-//     throw new ApiError(httpStatus.NOT_FOUND, 'Bài viết không tồn tại');
-//   }
-//   await post.remove();
-//   return post;
-// };
+const { PAGINATION } = require('../configs/constants')
 
 /**
  * Get all post of a user by userId
@@ -106,18 +33,64 @@ const createPost = async (postObject) => {
   return await Post.create(postObject)
 }
 
+const getPostQuantity = (userId) => {
+  return new Promise((resolve, reject) => {
+    resolve(Post.countDocuments({ user: userId }))
+  })
+}
+
+const getPostQuantityOfAll = () => {
+  return new Promise((resolve, reject) => {
+    resolve(Post.countDocuments())
+  })
+}
+
 /**
  * Get all posts of a user
  * @param {string} - Id of user
  * @returns {Promise<Post[]>}
  */
-const getPostsByUserId = async (userId) => {
-  return await Post.find({ user: userId })
+const getPostsByUserId = (userId, currentPage) => {
+  return new Promise((resolve, reject) => {
+    resolve(Post.find({ user: userId })
+                .skip((currentPage - 1) * PAGINATION['PER_PAGE'])
+                .limit(PAGINATION['PER_PAGE']))
+  })
 }
 
-const getAllPosts = async () => {
-  const posts = await Post.find({})
-  return posts
+const getAllPosts = (currentPage) => {
+  return new Promise((resolve, reject) => {
+    resolve(Post.find({})
+                .skip((currentPage - 1) * PAGINATION['PER_PAGE'])
+                .limit(PAGINATION['PER_PAGE']))
+  })
+}
+
+const paginatePostOfOneUser = (userId, currentPage) => {
+  return new Promise((resolve, reject) => {
+    Promise.all([getPostsByUserId(userId, currentPage), getPostQuantity(userId)])
+      .then(([posts, postQuantity]) => {
+        let result = {
+          posts,
+          pageQuantity: Math.ceil(postQuantity / PAGINATION['PER_PAGE']),
+        }
+        resolve(result)
+      })
+    })
+}
+
+
+const paginatePostOfAllUsers = (currentPage) => {
+  return new Promise((resolve, reject) => {
+    Promise.all([getAllPosts(currentPage), getPostQuantityOfAll()])
+      .then(([posts, postQuantity]) => {
+        let result = {
+          posts,
+          pageQuantity: Math.ceil(postQuantity / PAGINATION['PER_PAGE']),
+        }
+        resolve(result)
+      })
+    })
 }
 
 const getPostByPostId = async (postId) => {
@@ -149,6 +122,8 @@ module.exports = {
   getAllPosts,
   getPostByPostId,
   updatePostBySlug,
-  // updatePostById,
+  paginatePostOfOneUser,
+  paginatePostOfAllUsers,
+  // getPostQuantity,
   // deletePostById,
 }; 

@@ -11,23 +11,68 @@ const viewOwnPosts = catchAsync(async (req, res) => {
       msg: 'Fail to authenticate! Log in again please!',
     })
   }
-  const posts = await postService.getPostsByUserId(userId)
-  return res.render('pages/ownPosts_auth', {
-    title: 'Blog',
-    posts,
-  })
 
+  // Pagination
+  const queryObj = pick(req.query, ['page'])
+  let isNumber = new RegExp(/^\d+\.?\d*$/)
+  let currentPage = (!queryObj['page'] || !isNumber.test(queryObj['page'])) 
+    ? 1 
+    : parseInt(queryObj['page'], 10)
+
+  currentPage = (currentPage < 1)
+    ? 1
+    : currentPage
+
+  postService.paginatePostOfOneUser(userId, currentPage)
+    .then(result => {
+      if (currentPage > result['pageQuantity']) 
+        return res.status(400).render('pages/error', {
+          title: 'Page not found',
+          code: 404,
+          error: 'Page not fount',
+          description: `The page you’re looking for doesn’t exist.`,
+        })
+      return res.render('pages/ownPosts_auth', {
+        title: 'Blog',
+        posts: result['posts'],
+        pageQuantity: result['pageQuantity'],
+        currentPage,
+      })
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).send('INTERNAL SERVER ERROR')
+    })
 })
 
 const viewAllPosts = catchAsync(async (req, res) => {
-  const posts = await postService.getAllPosts()
+  // Pagination
+  const queryObj = pick(req.query, ['page'])
+  let isNumber = new RegExp(/^\d+\.?\d*$/)
+  let currentPage = (!queryObj['page'] || !isNumber.test(queryObj['page'])) ? 1 : queryObj['page']
+  currentPage = parseInt(currentPage, 10)
+  postService.paginatePostOfAllUsers(currentPage)
+    .then(result => {
+      if (currentPage > result['pageQuantity'] || currentPage < 1) 
+        return res.status(400).render('pages/error', {
+          title: 'Page not found',
+          code: 404,
+          error: 'Page not fount',
+          description: `The page you’re looking for doesn’t exist.`,
+        })
 
-  res.render('pages/allPosts_auth', {
-    title: 'Blog',
-    errors: req.flash('errors'),
-    successes: req.flash('successes'),
-    posts,
-  })
+      // postService.getAllPosts(3).then((result) => res.send(result))
+      return res.render('pages/allPosts_auth', {
+        title: 'Blog',
+        posts: result['posts'],
+        pageQuantity: result['pageQuantity'],
+        currentPage,
+      })
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).send('INTERNAL SERVER ERROR')
+    })
 })
 
 const viewSinglePost = catchAsync(async (req, res) => {
@@ -75,15 +120,6 @@ const createPost = catchAsync(async (req, res) => {
   }
 })
 
-// // [GET /posts/test]
-// const test = catchAsync(async (req, res) => {
-//   return res.render('pages/test')
-// })
-
-// // [POST /post.test]
-// const postTest = catchAsync(async (req, res) => {
-//   return res.send(req.body)
-// })
 
 module.exports = {
   viewOwnPosts,
@@ -93,7 +129,4 @@ module.exports = {
   viewCreatePost,
   viewUpdatePost,
   updatePost,
-
-  // postTest,
-  // test,
 }
