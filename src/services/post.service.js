@@ -33,7 +33,7 @@ const createPost = async (postObject) => {
   return await Post.create(postObject)
 }
 
-const getPostQuantity = (userId) => {
+const getPostQuantityOfOne = (userId) => {
   return new Promise((resolve, reject) => {
     resolve(Post.countDocuments({ user: userId }))
   })
@@ -53,6 +53,7 @@ const getPostQuantityOfAll = () => {
 const getPostsByUserId = (userId, currentPage) => {
   return new Promise((resolve, reject) => {
     resolve(Post.find({ user: userId })
+                .populate('user')
                 .skip((currentPage - 1) * PAGINATION['PER_PAGE'])
                 .limit(PAGINATION['PER_PAGE']))
   })
@@ -61,6 +62,7 @@ const getPostsByUserId = (userId, currentPage) => {
 const getAllPosts = (currentPage) => {
   return new Promise((resolve, reject) => {
     resolve(Post.find({})
+                .populate('user')
                 .skip((currentPage - 1) * PAGINATION['PER_PAGE'])
                 .limit(PAGINATION['PER_PAGE']))
   })
@@ -68,7 +70,7 @@ const getAllPosts = (currentPage) => {
 
 const paginatePostOfOneUser = (userId, currentPage) => {
   return new Promise((resolve, reject) => {
-    Promise.all([getPostsByUserId(userId, currentPage), getPostQuantity(userId)])
+    Promise.all([getPostsByUserId(userId, currentPage), getPostQuantityOfOne(userId)])
       .then(([posts, postQuantity]) => {
         let result = {
           posts,
@@ -76,6 +78,7 @@ const paginatePostOfOneUser = (userId, currentPage) => {
         }
         resolve(result)
       })
+      .catch(err => reject(err))
     })
 }
 
@@ -90,6 +93,7 @@ const paginatePostOfAllUsers = (currentPage) => {
         }
         resolve(result)
       })
+      .catch(err => reject(err))
     })
 }
 
@@ -124,6 +128,6 @@ module.exports = {
   updatePostBySlug,
   paginatePostOfOneUser,
   paginatePostOfAllUsers,
-  // getPostQuantity,
+  // getPostQuantityOfOne,
   // deletePostById,
 }; 
