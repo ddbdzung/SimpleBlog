@@ -7,36 +7,38 @@ const viewPosts = catchAsync(async (req, res) => {
   // Pagination
   const queryObj = pick(req.query, ['page'])
   let isNumber = new RegExp(/^\d+\.?\d*$/)
-  let currentPage = (!queryObj['page'] || !isNumber.test(queryObj['page'])) 
+  let currentPage = (!queryObj['page'] 
+                  || !isNumber.test(queryObj['page']) 
+                  || parseInt(queryObj['page'], 10) < 1) 
     ? 1 
     : parseInt(queryObj['page'], 10)
 
-  currentPage = (currentPage < 1)
-    ? 1
-    : currentPage
+  try {
+    let data = await postService.paginatePostOfAllUsers(currentPage)
+    let { pageQuantity, posts } = data
+    let postArr = []
+    posts.forEach(item => postArr.push(JSON.parse(JSON.stringify(item))))
     
-  postService.paginatePostOfAllUsers(currentPage)
-    .then(result => {
-      if (currentPage > result['pageQuantity'] || currentPage < 1) 
-        return res.status(400).render('pages/error', {
-          title: 'Page not found',
-          code: 404,
-          error: 'Page not fount',
-          description: `The page you’re looking for doesn’t exist.`,
-        })
-
-      // postService.getAllPosts(3).then((result) => res.send(result))
-      return res.render('pages/allPosts_auth', {
-        title: 'Blog',
-        posts: result['posts'],
-        pageQuantity: result['pageQuantity'],
-        currentPage,
+    if (currentPage > pageQuantity &&  pageQuantity !== 0) {
+      return res.status(400).render('pages/error', {
+        title: 'Page not found',
+        code: 404,
+        error: 'Page not fount',
+        description: `The page you’re looking for doesn’t exist.`,
       })
+    }
+    postArr.forEach(item => delete item.user.password)
+
+    return res.render('pages/allPosts', {
+      title: 'Blog',
+      posts: postArr,
+      pageQuantity,
+      currentPage,
     })
-    .catch(err => {
-      console.log(err)
-      res.status(500).send('INTERNAL SERVER ERROR')
-    })
+  } catch (e) {
+    console.log(e)
+    res.status(500).send('INTERNAL SERVER ERROR')
+  }
 })
 
 // [GET /:postSlug]
