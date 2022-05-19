@@ -2,7 +2,6 @@ require('dotenv').config()
 const express = require('express')
 const connectFlash = require('connect-flash')
 const httpStatus = require('http-status')
-const bodyParser = require('body-parser')
 const passport = require('passport')
 const methodOverride = require('method-override')
 const logger = require('morgan')
@@ -33,7 +32,7 @@ app.use(logger('dev'))
 // parse json request body
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(express.urlencoded({extended: true}))
 
 // Enable flash messages
 app.use(connectFlash())

@@ -13,8 +13,8 @@ const { initPassportLocal } = require('../configs/passport')
 initPassportLocal()
 
 router
-.route('/logout')
-.get(isAuth.checkLogIn, authController.getLogout)
+  .route('/logout')
+  .get(isAuth.checkLogIn, authController.getLogout)
 
 router
   .route('/sign-up')
