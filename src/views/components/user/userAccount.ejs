@@ -56,7 +56,7 @@
   function callUpdateUserInfoAPI(data) {
     $.ajax({
       url: '/user',
-      type: 'PUT',
+      type: 'PATCH',
       cache: false,
       processData: false,
       data: data,
@@ -80,13 +80,13 @@
   }
 
   $(document).ready(function () {
-    updateUserInfo()
     originUserData = {
       fullname: $('#fullname').val(),
       phone: $('#phone').val(),
       email: $('#email').val(),
       address: $('#address').val(),
     }
+    updateUserInfo()
 
     $('#reset-btn').bind('click', function () {
       userData = {}
@@ -102,8 +102,10 @@
         return;
       }
 
-      let JSONifyData = JSON.stringify(userData)
-      callUpdateUserInfoAPI(JSONifyData)
+      if (!userData.fullname) userData.fullname = originUserData.fullname
+      if (!userData.email) userData.email = originUserData.email
+      let JSONifiedData = JSON.stringify(userData)
+      callUpdateUserInfoAPI(JSONifiedData)
     })
   });
 </script>
