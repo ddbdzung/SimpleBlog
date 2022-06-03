@@ -21,15 +21,12 @@ const getUserData = catchAsync(async (req, res) => {
 })
 
 const updateData = catchAsync(async (req, res) => {
-  // Handle error
-  if (!req.body.hasOwnProperty('fullname') && !req.body.hasOwnProperty('email')) {
-    // Working normally
-  } else {
-    if (req.body.fullname === '' || req.body.email === '') {
-      return res.status(400).json({
-        errors: 'Full name and email must be fullfilled!',
-      })
-    }
+  let fullname = req.body?.fullname
+  let email = req.body?.email
+  if (!fullname || !email) {
+    return res.status(400).json({
+      errors: 'Fullname and email must be fulfilled!',
+    })
   }
 
   // Convert user ID from objectID to string
